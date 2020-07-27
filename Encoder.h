@@ -1,4 +1,7 @@
-#include "IO.h"
+#include <avr/io.h>
+#include "ResistorHandler.h"
+
+#define LOW_STATE 0x0
 
 class Encoder
 {
@@ -6,42 +9,51 @@ private:
     uint8_t pinA;
     uint8_t pinB;
 
-    uint8_t pinALastState = LOW;
+    uint8_t pinALastState;
 
     uint8_t pos = 0;
 
-public:
-    Encoder(uint8_t _pinA, uint8_t _pinB) : pinA{_pinA}, pinB{_pinB}
+    IResistorHandler *resitorHandler;
+
+    void setPinInputMode(uint8_t pin)
     {
-        setPinMode(_pinA, INPUT);
-        setPinMode(_pinB, INPUT);
+        DDRB &= ~(1 << pin);
+        PORTB &= ~(1 << pin);
     }
 
-    void pullEncoderState()
+    int readPinValue(uint8_t pin)
+    {
+        return PINB & (1 << pin);
+    }
+
+public:
+    Encoder(IResistorHandler *_resitorHandler, uint8_t _pinA, uint8_t _pinB) : pinA{_pinA}, pinB{_pinB}, resitorHandler{_resitorHandler}
+    {
+        setPinInputMode(_pinA);
+        setPinInputMode(_pinB);
+        pinALastState = readPinValue(pinA);
+    }
+
+    void pullEncoderPos()
     {
         auto currentPinAState = readPinValue(pinA);
-        if (pinALastState == LOW && currentPinAState == HIGH)
+        if (pinALastState != currentPinAState)
         {
-            if (readPinValue(pinB) == LOW)
-            {
-                if (pos > 0)
-                {
-                    pos--;
-                }
-            }
-            else
+            if (readPinValue(pinB) != currentPinAState)
             {
                 if (pos < 255)
                 {
                     pos++;
                 }
             }
-            pinALastState = currentPinAState;
+            else
+            {
+                if (pos > 0)
+                {
+                    pos--;
+                }
+            }
         }
-    }
-
-    uint8_t getEncoderPosition()
-    {
-        return pos;
+        pinALastState = currentPinAState;
     }
 };

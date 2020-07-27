@@ -12,7 +12,7 @@ public:
 class TaskManager
 {
 private:
-    vector<TaskData> _tasks;
+    avr::vector<TaskData> _tasks;
     uint64_t _prevTime = 0;
     uint16_t __current_avail_index = 0;
 
