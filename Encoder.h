@@ -1,5 +1,5 @@
 #include <avr/io.h>
-#include "ResistorHandler.h"
+#include "ResistorHandlerIf.h"
 
 #define LOW_STATE 0x0
 
@@ -41,17 +41,11 @@ public:
         {
             if (readPinValue(pinB) != currentPinAState)
             {
-                if (pos < 255)
-                {
-                    pos++;
-                }
+                resitorHandler->volumeUp();
             }
             else
             {
-                if (pos > 0)
-                {
-                    pos--;
-                }
+                resitorHandler->volumeDown();
             }
         }
         pinALastState = currentPinAState;

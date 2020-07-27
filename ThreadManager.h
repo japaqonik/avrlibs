@@ -48,6 +48,7 @@ public:
                 _tasks[i].callbackFuntion();
             }
         }
+        _prevTime = getTimeFuncPtr();
     }
     void removeTask(uint16_t _taskId)
     {
